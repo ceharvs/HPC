@@ -1,0 +1,4 @@
+slave-----------
+got arg=1000
+calling work sub(1000)
+done (sum=500500)

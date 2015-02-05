@@ -1,0 +1,10 @@
+1) need to generate ssh keys in order to ssh without a password:
+ssh-keygen -t rsa [ENTER] [ENTER...]
+cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
+now you can ssh to another host without being asked for a password
+
+2) edit: ~/.mpd.conf
+   add: MPD_SECRETWORD=secretword
+   permissions: chmod 600 ~/.mpd.conf
+
+3) compile and run using mpirun and a hostfile

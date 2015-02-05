@@ -1,0 +1,18 @@
+fid=fopen("mandel.out");
+[a1,ct] = fscanf(fid, '%d');    
+fclose(fid);
+
+k = 1
+for i = 1: 256;
+  for j = 1:256;
+    b1(i,j)= a1(k);	
+    k = k + 1;
+  end
+end
+
+mm = max(max(b1));
+b1 = b1/mm*64;
+colormap(jet);
+imagesc(b1);
+
+print -depsc2 mandel.eps
