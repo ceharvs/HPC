@@ -73,16 +73,16 @@ void dist(int ndim,double *r1,double *r2,double *dr)
 double V(double x)
 {
   /* potential: hamonic well that saturates to a max at PI/2 */
-  double pi=3.14159265;
-  double vv=square(sin(MIN(x,pi/2.0)));
+  double half_pi=3.14159265/2.0;
+  double vv=square(sin(MIN(x,half_pi)));
   return vv;
 }
 
 double dV(double x)
 {
   /* derivative of potential: hamonic well that saturates to a max at PI/2 */
-  double pi=3.14159265;
-  double vv= 2.0*sin(MIN(x,pi/2.0))*cos(MIN(x,pi/2.0));
+  double half_pi=3.14159265/2.0;
+  double vv= 2.0*sin(MIN(x,half_pi))*cos(MIN(x,half_pi));
   return vv;
 }
 
@@ -135,7 +135,7 @@ double calcpotent(int nprt,int ndim,double *coord)
       if( j==i ) continue;
       dist(ndim,&coord[i*ndim],&coord[j*ndim],rij);
       d=magnitude(ndim,rij);
-      pot+=1.0/2.0*V(d);
+      pot+=0.5*V(d);
     }
   }
   return pot;
@@ -147,7 +147,7 @@ double calckinetic(int nprt,int ndim,double mass,double *veloc)
   int    i;
   double kin=0.0;
   for(i=0; i<nprt; i++) {
-    kin += 1.0/2.0*mass*square(magnitude(ndim,&veloc[i*ndim]));
+    kin += 0.5*mass*square(magnitude(ndim,&veloc[i*ndim]));
   }
   return kin;
 }
@@ -170,8 +170,8 @@ void verlet(int nprt,int ndim,double dt,double mass,
   int i,k;
   for(i=0; i<nprt; i++) {
     for(k=0; k<ndim; k++) {
-      coord[i*ndim+k] += veloc[i*ndim+k]*dt + 1.0/2.0*square(dt)*accel[i*ndim+k];
-      veloc[i*ndim+k] += 1.0/2.0*dt*(force[i*ndim+k]/mass + accel[i*ndim+k]);
+      coord[i*ndim+k] += veloc[i*ndim+k]*dt + 0.5*square(dt)*accel[i*ndim+k];
+      veloc[i*ndim+k] += 0.5*dt*(force[i*ndim+k]/mass + accel[i*ndim+k]);
       accel[i*ndim+k]  = force[i*ndim+k]/mass;
     }
   }
