@@ -1,0 +1,16 @@
+Original Timing
+real	0m21.199s
+user	0m21.141s
+sys		0m0.036s
+
+Changes
+- square method - removed power
+- pi/2 was used often - changed to half_pi and removed division
+-Changed all 1.0/2.0 to 0.5
+
+real	0m19.038s
+user	0m19.009s
+sys		0m0.012s
+
+recip_mass = 1.0/mass
+and index = i*ndim+k in verlet
