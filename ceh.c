@@ -73,7 +73,7 @@ void dist(int ndim,double *r1,double *r2,double *dr)
 double V(double x)
 {
   /* potential: hamonic well that saturates to a max at PI/2 */
-  double half_pi=3.14159265/2.0;
+  double half_pi=3.14159265*0.5;
   double vv=square(sin(MIN(x,half_pi)));
   return vv;
 }
@@ -81,8 +81,9 @@ double V(double x)
 double dV(double x)
 {
   /* derivative of potential: hamonic well that saturates to a max at PI/2 */
-  double half_pi=3.14159265/2.0;
-  double vv= 2.0*sin(MIN(x,half_pi))*cos(MIN(x,half_pi));
+  //double half_pi=3.14159265/2.0;
+  double value=MIN(x, 3.14159265*0.5)
+  double vv= 2.0*sin(value)*cos(value);
   return vv;
 }
 
@@ -170,9 +171,11 @@ void verlet(int nprt,int ndim,double dt,double mass,
   int i,k;
   for(i=0; i<nprt; i++) {
     for(k=0; k<ndim; k++) {
-      coord[i*ndim+k] += veloc[i*ndim+k]*dt + 0.5*square(dt)*accel[i*ndim+k];
-      veloc[i*ndim+k] += 0.5*dt*(force[i*ndim+k]/mass + accel[i*ndim+k]);
-      accel[i*ndim+k]  = force[i*ndim+k]/mass;
+	  recip_mass = 1.0/mass
+	  index = i*ndim+k
+      coord[index] += veloc[index]*dt + 0.5*square(dt)*accel[index];
+      veloc[index] += 0.5*dt*(force[index]*recip_mass + accel[index]);
+      accel[index]  = force[index]*recip_mass;
     }
   }
 }
