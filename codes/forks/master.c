@@ -7,7 +7,7 @@ int main(int argc,char **argv)
 {
   char *slave="./slave.x";  /* slave code executable */
   char *args[]={"1000"};    /* default argument for slave */
-  int   err,opt=0;
+  int   i,err,sum,opt=0;
   pid_t pid;
 
   
@@ -26,6 +26,13 @@ int main(int argc,char **argv)
     err=execv(slave,args);
     if( err ) {fprintf(stderr,"err=%d\n",err);}
   }
+
+  /* Compute sum fromm i=1,n */
+  printf("summing from 1 to %d\n",1000);
+  for(i=1;i<1000;i++){
+    sum+=2*i;
+  }
+  printf("sum=%d\n",sum);
 
   /* wait */
   waitpid(-1,&err,opt);

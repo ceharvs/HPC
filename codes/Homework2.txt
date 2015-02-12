@@ -1,0 +1,21 @@
+Christine Harvey
+
+Homework 2.1
+
+Part 1:
+Signals - Edited code to include a counter variable for the number of times the exit command has been given.  Once the counter reaches three, the program reaches the "done" stage.
+
+Part 2:
+Pipes - Worked out the part for ipc2.c but not the icp1.c file.  Not sure how to buffer multiple strings/values. 
+
+Part 3:
+Threads - Unable to get threads working properly.  Same issues from class.
+
+
+Homework 2.2
+
+Part 1: Forks has been updated so the master computes the sum of 2*i or i=1:n.
+
+Part 2: Sockets - need to figure out how to send a number with sockets.
+
+Part 3: OMP - Added omp_set_num_threads() command.

@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <sys/signal.h>
 
-int done=0; 
+int done=0;
+int counter=0;
 
 void quit()
 {
   printf("interrupt signal received\n");
-  done=1;
+  counter+=1;
+  if(counter==3) done=1;
 }
 
 int main(int argc,char **argv)

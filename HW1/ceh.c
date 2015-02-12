@@ -55,12 +55,7 @@ int init(int nprt,int ndim,double *box,
   return 0;
 }
 
-// CEH: Change this to multiplication
-double square(double x)
-{
-   return x*x;
-}
-
+/* CEH: Change this to multiplication */
 void dist(int ndim,double *r1,double *r2,double *dr)
 {
   /* calc distance vector */
@@ -74,14 +69,14 @@ double V(double x)
 {
   /* potential: hamonic well that saturates to a max at PI/2 */
   double half_pi=3.14159265*0.5;
-  double vv=square(sin(MIN(x,half_pi)));
+  double sin_min=sin(MIN(x,half_pi));
+  double vv=sin_min*sin_min;
   return vv;
 }
 
 double dV(double x)
 {
   /* derivative of potential: hamonic well that saturates to a max at PI/2 */
-  //double half_pi=3.14159265/2.0;
   double value=MIN(x, 3.14159265*0.5);
   double vv= 2.0*sin(value)*cos(value);
   return vv;
@@ -92,7 +87,7 @@ double magnitude(int ndim,double *v1)
   /* magnitude of a vector */
   int    k;
   double d=0.0;
-  for(k=0; k<ndim; k++) d+=square(v1[k]);
+  for(k=0; k<ndim; k++) d+=v1[k]*v1[k];
   d=sqrt(d);
   return d;
 }
@@ -147,8 +142,10 @@ double calckinetic(int nprt,int ndim,double mass,double *veloc)
   /* calc kinetic energy */
   int    i;
   double kin=0.0;
+  double value=0.0;
   for(i=0; i<nprt; i++) {
-    kin += 0.5*mass*square(magnitude(ndim,&veloc[i*ndim]));
+    value=magnitude(ndim,&veloc[i*ndim]);
+    kin += 0.5*mass*value*value;
   }
   return kin;
 }
@@ -173,7 +170,7 @@ void verlet(int nprt,int ndim,double dt,double mass,
     for(k=0; k<ndim; k++) {
 	  double recip_mass = 1.0/mass;
 	  int index = i*ndim+k;
-      coord[index] += veloc[index]*dt + 0.5*square(dt)*accel[index];
+      coord[index] += veloc[index]*dt + 0.5*dt*dt*accel[index];
       veloc[index] += 0.5*dt*(force[index]*recip_mass + accel[index]);
       accel[index]  = force[index]*recip_mass;
     }

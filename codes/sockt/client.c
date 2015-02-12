@@ -18,9 +18,9 @@ main(int argc, char *argv[])
   int cl;     // length of returned client sockaddr_in
   int sl;     // length of server sockaddr_in
 
-  char input_buf[1024];  // character string for input buffer
+  int input_buf[1024];  // character string for input buffer
   int n;                 // length of input buffer
-  char message[1024];    // character string for output buffer
+  int message[1024];    // character string for output buffer
   int ml;                // length of output buffer
   
   struct sockaddr_in server;  // socket data types for outgoing 
@@ -66,15 +66,13 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  
-  // write an output message to the server
-  strcpy(message, "now is the time for all good men to come to the aid of their party\n");
-  n = write(sock, message, strlen(message));
+  // send an output number to the server
+  n = write(sock, 11500, 1);
 
   // read the returning message
-  input_buf[0] = '\0';
   n = read(sock, input_buf, 1024);
-  printf("read %s from server \n",input_buf);
+  printf("read %d from server \n",input_buf);
+
 
 }
 

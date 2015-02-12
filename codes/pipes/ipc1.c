@@ -37,9 +37,11 @@ int main(int argc,char **argv)
       
    /* scan buffer for number */
    sscanf(buf,"%d",&sum2);
+   sscanf(buf,"%d",&my_sum);
 
    /* print */
    printf("my sum=%d, got sum2=%d\n",sum,sum2);
+   printf("other sum=%d\n",my_sum);
    fflush(stdout);
 
    /* done */

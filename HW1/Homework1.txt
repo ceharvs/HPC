@@ -1,0 +1,15 @@
+Homework 1
+Christine Harvey
+
+Optimizations made to pp.c Code
+- Defined HALFPI as PI/2 in a #define statement. [Line 11]
+- Switched all loops so ndim is on the outer loop and nprt is in the inner loop.  This fix had multiple occurances. [Line 46,105,119,182]
+- Referenced items outside of the inner loops, used for the box statement, and multiple other indicies. [Line 47,122]
+- Switched multiplication for addition. [Line 47, 50]
+- Removed the square function to remove function calls and replaced with multiplication. [REMOVED]
+- Pre-Computed the Sine function to reduce computation. [Line 73]
+- Pre-detrmine the minimum of x and HALF_PI to avoid computing twice. [Line 82]
+- Compute v1[k] to avoid extra referencing.  [Line 94]
+- Removed the pointer for &coord[index] to remove excessive checking and computations. [Line 117,141]
+- Switched dividing by 2 for multiplying by 0.5. [Line 147,185,186]
+- Pre-computed the index to save time. [Line 184]

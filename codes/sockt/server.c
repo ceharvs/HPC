@@ -18,9 +18,9 @@ main(int argc, char *argv[])
   int cl;     // length of returned client sockaddr_in
   int sl;     // length of server sockaddr_in
 
-  char input_buf[1024];  // character string for input buffer
+  int input_buf[1024];  // character string for input buffer
   int n;                 // length of input buffer
-  char message[1024];    // character string for output buffer
+  int message[1024];    // character string for output buffer
   int ml;                // length of output buffer
   
   struct sockaddr_in server, client;  // socket data types for outgoing 
@@ -56,7 +56,7 @@ main(int argc, char *argv[])
   
   // enter an infinite loop to wait for a message
   while(1) {
-    
+    int i,result=0;
 
     // accept an incoming communication
     fd = accept(sock, 
@@ -69,12 +69,13 @@ main(int argc, char *argv[])
 
     // read the data being sent from the client and print it out locally
     n = read(fd, input_buf, 1024);
-    printf("%s\n",input_buf);
+    printf("%d\n",input_buf);
 
     // load a message into the output buffer, and then write it
-    strcpy(message,"our finest hour \n");
-    ml = strlen(message);
-    write(fd, message, ml);
+    for(i=0;i<n;i++) {
+        result+=i;
+    }
+    write(fd, result, 1);
 
     // close the socket - hang up on the client
     close(fd);
