@@ -1,0 +1,31 @@
+
+EXE1=cc.x
+OBJ1=cc.o
+LIB1=-lm
+
+
+PRF=-pg
+CMP=gcc -g -c --pedantic -Wall -fopenmp
+LNK=gcc -fopenmp
+FOR=gfortran -g -c -p -fopenmp
+FLN=gfortran -g -fopenmp
+
+# Intel compiler links
+#CMP=icc -g -c 
+#LNK=icc
+#FOR=ifort -g -c
+#FLN=ifort -g 
+
+all: $(EXE0) $(EXE1) $(EXE2)
+	@echo "done"
+
+clean:
+	rm -f *.o *.x 
+
+$(EXE1): $(OBJ1) 
+	$(LNK) -o $@ $(OBJ1) $(LIB1) $(PG)
+
+cc.o: cc.c
+	$(CMP) $? $(PG)
+
+
