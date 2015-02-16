@@ -18,4 +18,15 @@ Part 1: Forks has been updated so the master computes the sum of 2*i or i=1:n.
 
 Part 2: Sockets - need to figure out how to send a number with sockets.
 
-Part 3: OMP - Before running the code, use export OMP_NUM_THREADS=5 to specify the number of threads.
+Part 3: OMP - Before running the code, use export OMP_NUM_THREADS=5 to specify the number of threads.  For this code, the basic timing results are:
+OMP_NUM_THREADS=1
+user time: 26.770s
+
+OMP_NUM_THREADS=2
+user time: 13.452s
+
+OMP_NUM_THREADS=4
+user time: 6.885s
+
+OMP_NUM_THREADS=8
+user time: 3.432s

@@ -1,0 +1,23 @@
+Timing Results
+===============
+
+OMP_NUM_THREADS=1
+user: 35.434s
+
+OMP_NUM_THREADS=4
+user: 29.292s
+
+OMP_NUM_THREADS=4
+user: 26.860s
+
+OMP_NUM_THREADS=6
+user: 25.602s
+
+OMP_NUM_THREADS=8
+user: 31.722s
+
+Summary
+===============
+Results were not as great as expected.  Not sure why, might be overdoing the threading or removing usefulness and speed of array access with excessive threading.
+
+The problem at 8 cores could be due to overloading the system.  Sometimes with 8 cores there's sort of "catching" when running and random/short delays.
