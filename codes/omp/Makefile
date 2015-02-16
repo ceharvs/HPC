@@ -8,8 +8,6 @@ OBJ2=pif90.o
 EXE3=pic.x
 OBJ3=pic.o 
 
-OMP_NUM_THREADS=5
-
 CMP=gcc -g -c -fopenmp
 LNK=gcc -fopenmp
 FCM=gfortran -c -fopenmp

@@ -21,9 +21,9 @@ clean:
 	rm -f *.o *.x 
 
 $(EXE1): $(OBJ1) 
-	$(LNK) -o $@ $(OBJ1) $(LIB1)
+	$(LNK) -o $@ $(OBJ1) $(LIB1) $(PRF)
 
 pp.o: pp.c
-	$(CMP) $?
+	$(CMP) $? $(PRF)
 
 
