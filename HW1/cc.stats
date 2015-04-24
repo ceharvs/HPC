@@ -1,0 +1,198 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 52.02     13.02    13.02 349400000     0.00     0.00  calcforces
+ 21.32     18.36     5.34 49900000     0.00     0.00  zeroforces
+  9.73     20.79     2.44      200    12.18    12.18  compute
+  6.13     22.33     1.53      400     3.83     3.83  calcpotent
+  5.01     23.58     1.25                             calckinetic
+  3.62     24.49     0.91      400     2.27    20.59  verlet
+  2.08     25.01     0.52 199600000     0.00     0.00  magnitude
+  0.04     25.02     0.01      200     0.05    20.65  main
+  0.00     25.02     0.00     1500     0.00     0.00  init
+  0.00     25.02     0.00      200     0.00    40.44  advance
+  0.00     25.02     0.00        1     0.00     0.00  dist
+  0.00     25.02     0.00        1     0.00     0.00  square
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.04% of 25.02 seconds
+
+index % time    self  children    called     name
+                1.86    0.00 50000000/349400000     verlet [3]
+               11.16    0.00 299400000/349400000     calckinetic [2]
+[1]     52.0   13.02    0.00 349400000         calcforces [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     51.2    1.25   11.55                 calckinetic [2]
+               11.16    0.00 299400000/349400000     calcforces [1]
+                0.39    0.00 149700000/199600000     magnitude [11]
+-----------------------------------------------
+                0.45    3.67     200/400         advance [4]
+                0.45    3.67     200/400         main [7]
+[3]     32.9    0.91    7.33     400         verlet [3]
+                5.34    0.00 49900000/49900000     zeroforces [6]
+                1.86    0.00 50000000/349400000     calcforces [1]
+                0.13    0.00 49900000/199600000     magnitude [11]
+-----------------------------------------------
+                0.00    8.09     200/200         __libc_csu_init [5]
+[4]     32.3    0.00    8.09     200         advance [4]
+                0.45    3.67     200/400         verlet [3]
+                2.44    0.00     200/200         compute [9]
+                1.53    0.00     400/400         calcpotent [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]     32.3    0.00    8.09                 __libc_csu_init [5]
+                0.00    8.09     200/200         advance [4]
+-----------------------------------------------
+                5.34    0.00 49900000/49900000     verlet [3]
+[6]     21.3    5.34    0.00 49900000         zeroforces [6]
+-----------------------------------------------
+                0.01    4.12     200/200         _fini [8]
+[7]     16.5    0.01    4.12     200         main [7]
+                0.45    3.67     200/400         verlet [3]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]     16.5    0.00    4.13                 _fini [8]
+                0.01    4.12     200/200         main [7]
+                0.00    0.00       1/1           dist [13]
+-----------------------------------------------
+                2.44    0.00     200/200         advance [4]
+[9]      9.7    2.44    0.00     200         compute [9]
+-----------------------------------------------
+                1.53    0.00     400/400         advance [4]
+[10]     6.1    1.53    0.00     400         calcpotent [10]
+-----------------------------------------------
+                0.13    0.00 49900000/199600000     verlet [3]
+                0.39    0.00 149700000/199600000     calckinetic [2]
+[11]     2.1    0.52    0.00 199600000         magnitude [11]
+-----------------------------------------------
+                0.00    0.00    1500/1500        dV [17]
+[12]     0.0    0.00    0.00    1500         init [12]
+-----------------------------------------------
+                0.00    0.00       1/1           _fini [8]
+[13]     0.0    0.00    0.00       1         dist [13]
+-----------------------------------------------
+                0.00    0.00       1/1           V [15]
+[14]     0.0    0.00    0.00       1         square [14]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+
+Index by function name
+
+   [4] advance                 [9] compute                 [7] main
+   [1] calcforces             [13] dist                   [14] square
+   [2] calckinetic            [12] init                    [3] verlet
+  [10] calcpotent             [11] magnitude               [6] zeroforces
