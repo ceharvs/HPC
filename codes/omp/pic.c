@@ -2,8 +2,8 @@
 
 int main(int argc,char **argv)
 {
-  int i;
-  double x,pi;
+  int ix, iy;
+  double nx, ny, a, b;
   int    nx=1000000000;           /* nr intervals */
   double dx=1.0/((double)(nx));   /* interval */
   double s =0.0;                  /* sum */
