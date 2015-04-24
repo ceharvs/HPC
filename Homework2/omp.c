@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 double func( int x, int y, double a, double b) {
-	return a*ix + b*(x)/(x*x+y*y)
+	return a*x + b*(x)/(x*x+y*y);
 }
 
 int main(int argc,char **argv)
@@ -50,12 +50,12 @@ int main(int argc,char **argv)
 	for(ix=0; ix<nx; ix++){
 		for(iy=0; iy<ny; iy++){
 			if(magnitude[ix][iy] > maxMAG){
-				maximum = magnitude[ix][iy];
+				maxMAG = magnitude[ix][iy];
 				maxX = ix;
 				maxY = iy;
 			}
 		}
 	}
 	
-	printf("Maximum magnitude is at (%d, %d) and is %f.\n", maxX, maxY, maximum)
+	printf("Maximum magnitude is at (%d, %d) and is %f.\n", maxX, maxY, maxMAG);
 }
