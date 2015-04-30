@@ -1,23 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double func( int x, int y, double a, double b) {
+double func( double x, double y, double a, double b) {
 	return a*x + b*(x)/(x*x+y*y);
 }
+
+
 
 int main(int argc,char **argv)
 {
 	int ix, iy, nx, ny, maxX, maxY;
 	double a, b, deltax, deltay, maxMAG, *arr, *gradx, *grady, *magnitude;
+        double x,y;
 	FILE *fp;
   
 	/* Declare Variables */
 	a = 0.5;
 	b = 3.25;
 	deltax = 0.01;
-	deltay = 0.02;
+	deltay = 0.01;
 	nx = 1000;
-	ny = 2000;
+	ny = 1000;
   
 	/* Find the maximum magnitude */
 	maxX = 0;
@@ -33,8 +36,10 @@ int main(int argc,char **argv)
 	/* Set up initial array values */
 	#pragma omp parallel for private (ix, iy) shared(nx, ny, a, b) 
 	for(ix=0; ix<nx; ix++){
+            x=ix*deltax;
 		for(iy=0; iy<ny; iy++){
-			arr[nx*ix+iy] = func(ix, iy, a, b);
+                    y=iy*deltay;
+			arr[nx*ix+iy] = func(x, y, a, b);
 		}
 	}
 	
@@ -46,17 +51,17 @@ int main(int argc,char **argv)
 	fp = fopen("output.csv","w");
 	fprintf(fp,"x,y,gradx,grady\n");
 		 
-	#pragma omp parallel for private (ix, iy) shared(nx, ny, deltax, deltay, a, b) 
-	for(ix=0; ix<nx; ix++){
-		for(iy=0; iy<ny; iy++){
-			gradx[nx*ix+iy] = (func(ix + deltax, iy, a, b) - func(ix-deltax, iy, a, b))/(2*deltax);
-			grady[nx*ix+iy] = (func(ix, iy+deltay, a, b) - func(ix, iy-deltay, a, b))/(2*deltay);
-			magnitude[nx*ix+iy] = (func(ix+deltax,iy+deltay, a, b)-func(ix+deltax,iy-deltay, a, b) - func(ix-deltax, iy+deltay, a, b) + func(ix-deltax, iy-deltay, a, b))/(4*deltax*deltay);
+	#pragma omp parallel for private (ix, iy) shared(nx, ny, deltax, deltay) 
+	for(ix=1; ix<nx-1; ix++){
+		for(iy=1; iy<ny-1; iy++){
+			gradx[nx*ix+iy] = (arr[nx*(ix+1)+iy]-arr[nx*(ix-1)+iy])/(2*deltax);
+			grady[nx*ix+iy] = (arr[nx*ix+iy+1]-arr[nx*ix+iy-1])/(2*deltay);
+			magnitude[nx*ix+iy] = sqrt(pow(gradx[nx*ix+iy],2) +pow(grady[nx*ix+iy],2) );
 		}
 	}
 	
-	for(ix=0; ix<nx; ix++){
-		for(iy=0; iy<ny; iy++){
+	for(ix=1; ix<nx-1; ix++){
+		for(iy=1; iy<ny-1; iy++){
 			fprintf(fp, "%d,%d,%f,%f\n",ix,iy,gradx[nx*ix+iy],grady[nx*ix+iy]);
 			if(magnitude[nx*ix+iy] > maxMAG){
 				maxMAG = magnitude[nx*ix+iy];
