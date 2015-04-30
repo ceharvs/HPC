@@ -19,8 +19,8 @@ int main(int argc,char **argv)
 	b = 3.25;
 	deltax = 0.01;
 	deltay = 0.01;
-	nx = 1000;
-	ny = 1000;
+	nx = 100;
+	ny = 100;
   
 	/* Find the maximum magnitude */
 	maxX = 0;
@@ -62,7 +62,7 @@ int main(int argc,char **argv)
 	
 	for(ix=1; ix<nx-1; ix++){
 		for(iy=1; iy<ny-1; iy++){
-			fprintf(fp, "%d,%d,%f,%f\n",ix,iy,gradx[nx*ix+iy],grady[nx*ix+iy]);
+			fprintf(fp, "%f,%f,0,%f,%f\n",ix*deltax,iy*deltay,gradx[nx*ix+iy],grady[nx*ix+iy]);
 			if(magnitude[nx*ix+iy] > maxMAG){
 				maxMAG = magnitude[nx*ix+iy];
 				maxX = ix;
