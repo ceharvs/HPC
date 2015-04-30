@@ -25,7 +25,7 @@ clean:
 $(EXE1): $(OBJ1) 
 	$(LNK) -o $@ $(OBJ1) $(LIB1) $(PG)
 
-cc.o: omp.c
+omp.o: omp.c
 	$(CMP) $? $(PG)
 
 
