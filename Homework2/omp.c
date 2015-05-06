@@ -10,7 +10,7 @@ double func( double x, double y, double a, double b) {
 int main(int argc,char **argv)
 {
 	int ix, iy, nx, ny, maxX, maxY;
-	double a, b, deltax, deltay, maxMAG, *arr, *gradx, *grady, *magnitude;
+	double a, b, deltax, deltay, maxMAG, *arr, *gradx, *grady, *magnitude, x0, y0;
         double x,y;
 	FILE *fp;
   
@@ -19,6 +19,8 @@ int main(int argc,char **argv)
 	b = 3.25;
 	deltax = 0.01;
 	deltay = 0.01;
+	x0 = -0.5;
+	y0 = -0.5;
 	nx = 100;
 	ny = 100;
   
@@ -36,9 +38,9 @@ int main(int argc,char **argv)
 	/* Set up initial array values */
 	#pragma omp parallel for private (ix, iy) shared(nx, ny, a, b) 
 	for(ix=0; ix<nx; ix++){
-            x=ix*deltax;
+            x=x0+ix*deltax;
 		for(iy=0; iy<ny; iy++){
-                    y=iy*deltay;
+                    y=y0+iy*deltay;
 			arr[nx*ix+iy] = func(x, y, a, b);
 		}
 	}
@@ -49,7 +51,7 @@ int main(int argc,char **argv)
 	
 	/* Print to file in format x,y,gradx,grady */
 	fp = fopen("output.csv","w");
-	fprintf(fp,"x,y,gradx,grady\n");
+	fprintf(fp,"x,y,z,gradx,grady\n");
 		 
 	#pragma omp parallel for private (ix, iy) shared(nx, ny, deltax, deltay) 
 	for(ix=1; ix<nx-1; ix++){
@@ -62,14 +64,11 @@ int main(int argc,char **argv)
 	
 	for(ix=1; ix<nx-1; ix++){
 		for(iy=1; iy<ny-1; iy++){
-			fprintf(fp, "%f,%f,0,%f,%f\n",ix*deltax,iy*deltay,gradx[nx*ix+iy],grady[nx*ix+iy]);
+			fprintf(fp, "%f,%f,0,%f,%f\n",x0+ix*deltax,y0+iy*deltay,gradx[nx*ix+iy],grady[nx*ix+iy]);
 			if(magnitude[nx*ix+iy] > maxMAG){
 				maxMAG = magnitude[nx*ix+iy];
 				maxX = ix;
 				maxY = iy;
-			}
-			if(ix==2 && iy==2){
-				printf("Magnitude at (1,1) is %f.\n",magnitude[nx*ix+iy]);
 			}
 		}
 	}
