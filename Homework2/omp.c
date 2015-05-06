@@ -22,8 +22,8 @@ int main(int argc,char **argv)
 	deltay = 0.002;
 	x0 = -0.1;
 	y0 = -0.1;
-	nx = 100;
-	ny = 100;
+	nx = 101;
+	ny = 101;
   
 	/* Find the maximum magnitude */
 	maxX = 0.0;
