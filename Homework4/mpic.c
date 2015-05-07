@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+#include <string.h>
 
 #include <mpi.h>
 
@@ -17,58 +18,115 @@ double yGRAD(double x, double y) {
     return -(0.3*x*y)/((x*x+y*y)*(x*x+y*y));
 }
 
+double magnitude(double vx, double vy) {
+    return sqrt(vx*vx+vy*vy);
+}
+
 
 int main(int argc,char **argv)
 {
-  int err,nprc,myidi, i, j, N, Lx, Ly;
-  double *xPts, *yPts, *xVel, *yVel, LxMAX, LyMAX, deltaX, deltaY, xpt, ypt;
+  FILE *fp;
+  int k, i, j, err, nprc, rank, N, Lx, Ly, elements, my_Lx, my_Ly;
+  double x, y, *xP, *yP, *xV, *yV, LxMAX, LyMAX, deltaX, deltaY;
+  double xpt, ypt, min_X, max_X, min_Y, max_Y, deltaT, minT, dT;
   char buf[512];
   err=MPI_Init(&argc,&argv);
   err=MPI_Comm_size(MPI_COMM_WORLD,&nprc);
-  err=MPI_Comm_rank(MPI_COMM_WORLD,&myid);
+  err=MPI_Comm_rank(MPI_COMM_WORLD,&rank);
   gethostname(buf,512);
-  
-  deltaX = 1.0;
-  deltaY = 1.0;
-  LxMAX = 4.0;
-  LyMAX = 2.0;
-  Lx = ceil(Lx/deltaX);
-  Ly = ceil(Ly/deltaY);
-  N = 1;
-  xPts = malloc(N*Lx*Ly*sizeof(double)); 
-  yPts = malloc(N*Lx*Ly*sizeof(double)); 
-  xVel = malloc(N*Lx*Ly*sizeof(double)); 
-  yVel = malloc(N*Lx*Ly*sizeof(double)); 
 
+  /* X and Y step sizes */
+  deltaX = 0.0005;
+  deltaY = 0.0005;
+  minT = 500;
+
+  /* X and Y maximum values */
+  LxMAX = 1.0;
+  LyMAX = 1.0;
+  
+  /* Total Number of Bins */
+  Lx = ceil(LxMAX/deltaX);
+  Ly = ceil(LyMAX/deltaY);
+
+  /* Number of particles per bin */
+  N = 10;
+
+  /* Elements per processor */
+  elements = (N*Lx*Ly)/nprc;
+
+  /* Bin ranges on the processor */
+  min_X = (LxMAX/nprc)*rank;
+  max_X = (LxMAX/nprc)*(rank+1);
+  min_Y = 0.0;  // We only split in the X direction for this
+  max_Y = LyMAX;
+
+  /* Local number of bins */
+  my_Lx = Lx/nprc;
+  my_Ly = Ly; //We are only splitting the X direction across processors
+
+  xP = malloc(elements*sizeof(double)); 
+  yP = malloc(elements*sizeof(double)); 
+  xV = malloc(elements*sizeof(double));
+  yV = malloc(elements*sizeof(double)); 
+
+  if(rank==0){
+    fp=fopen("output0.csv","w");
+  } else if(rank==1){
+    fp=fopen("output1.csv","w");
+  } else if(rank==2) {
+    fp=fopen("output2.csv","w");
+  } else {
+    fp=fopen("output3.csv","w");
+  }    
+  
   /* Create a 2D Domain of Lengths Lx and Ly */
   /* I am using a comain of Lx by Ly, split into rectangular blocks using deltaX and deltaY */
   /* Then generating N particles randomly in each sub-domain */
-  for(i=0; i<LxMAX; i+=deltaX) {
-    for(j=0; j<LyMAX; j+=deltaY) {
-      xpt = randRange(i, i+deltaX);
-      ypt = randRange(j, j+deltaY);
-      xPts[i*Lx+j] = xpt;
-      yPts[i*Lx+j] = ypt;
+  printf("proc=%d\t minX=%f, maxX=%f, my_Lx=%d\n",rank, min_X, max_X, my_Lx);
+  printf("proc=%d\t minY=%f, maxY=%f, my_Ly=%d\n",rank, min_Y, max_Y, my_Ly);
+  for(i=0; i<my_Lx; i++) {
+    x = min_X+i*deltaX; 
+    for(j=0; j<my_Ly; j++) {
+      y = min_Y+j*deltaY;
+      for (k=0; k<N; k++) { 
+
+        xpt = randRange(x, x+deltaX);
+        ypt = randRange(y, y+deltaY);
+        xP[i*my_Lx+j+k] = xpt;
+        yP[i*my_Lx+j+k] = ypt;
       
-      /* Compute the X and Y velocities*/
-      xVel[i*Lx+j] = xGRAD(xpt, ypt);
-      yVel[i*Lx+j] = yGRAD(xpt, ypt);
-      
-      
+        /* Compute the X and Y velocities*/
+        xV[i*my_Lx+j+k] = xGRAD(xpt, ypt);
+        yV[i*my_Lx+j+k] = yGRAD(xpt, ypt);
+        
+        /* Compute the deltaT */
+        deltaT = deltaX/magnitude(xV[i*my_Lx+j+k],yV[i*my_Lx+j+k]);
+        if (deltaT < minT) {
+            minT = deltaT;
+        }
+      }
     }
   }
+  
+  MPI_Reduce(&minT,&dT,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
 
-  for(i=0; i<LxMAX; i+=deltaX) {
-    for(j=0; j<LyMAX; j+=deltaY) {
-      printf("Velocity: %f\n", xVel[i*Lx+j]);
-      printf("Velocity: %f\n", yVel[i*Lx+j]);
-    }
+  /* Print the Minimum Delta T */
+  if(rank==0){
+    printf("minimum deltaT = %f\n",dT);
   }
 
-     
+  /* Print file to outputs */
+  fprintf(fp, "x,y,xVel,yVel\n");
+  for(i=0; i<elements; i++){
+    //fprintf(fp,"%f,%f,%f,%f\n",xP[i],yP[i],xV[i],yV[i]);
+  }
+  
 
-  //printf("host=%s nproc=%d myid=%d\n",buf,nprc,myid);
-
+  free(xP);
+  free(yP);
+  free(xV);
+  free(yV);
+  fclose(fp);
   err=MPI_Finalize();
   return 0;
 }
