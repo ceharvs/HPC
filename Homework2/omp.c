@@ -18,12 +18,12 @@ int main(int argc,char **argv)
 	/* Declare Variables */
 	a = 0.5;
 	b = 0.15;
-	deltax = 0.002;
-	deltay = 0.002;
+	deltax = 0.00002;
+	deltay = 0.00002;
 	x0 = -0.1;
 	y0 = -0.1;
-	nx = 101;
-	ny = 101;
+	nx = 10001;
+	ny = 10001;
   
 	/* Find the maximum magnitude */
 	maxX = 0.0;
@@ -70,7 +70,7 @@ int main(int argc,char **argv)
 	        x=x0+ix*deltax;
 		for(iy=1; iy<ny-1; iy++){
                     	y=y0+iy*deltay;
-			fprintf(fp, "%f,%f,0,%f,%f\n",x,y,gradx[nx*ix+iy],grady[nx*ix+iy]);
+			/*fprintf(fp, "%f,%f,0,%f,%f\n",x,y,gradx[nx*ix+iy],grady[nx*ix+iy]);*/
 			if(magnitude[nx*ix+iy] > maxMAG){
 				maxMAG = magnitude[nx*ix+iy];
 				maxX = x;
