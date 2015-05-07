@@ -37,7 +37,7 @@ int main(int argc,char **argv)
 	magnitude = malloc(nx*ny*sizeof(double));
   
 	/* Set up initial array values */
-	/*#pragma omp parallel for private (ix, iy, x, y) shared(nx, ny, a, b)*/
+	#pragma omp parallel for private (ix, iy, x, y) shared(nx, ny, a, b)
 	for(ix=0; ix<nx; ix++){
             x=x0+ix*deltax;
 		for(iy=0; iy<ny; iy++){
@@ -53,7 +53,7 @@ int main(int argc,char **argv)
 	fp = fopen("output.csv","w");
 	fprintf(fp,"x,y,z,gradx,grady\n");
 		 
-	/*#pragma omp parallel for private (ix, iy) shared(nx, ny, deltax, deltay) */
+	#pragma omp parallel for private (ix, iy, x, y) shared(nx, ny, deltax, deltay) 
 	for(ix=1; ix<nx-1; ix++){
 	        x=x0+ix*deltax;
 		for(iy=1; iy<ny-1; iy++){
