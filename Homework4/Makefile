@@ -1,9 +1,7 @@
 
 EXE1=mpic.x
 OBJ1=mpic.o
-
-EXE2=mpif.x
-OBJ2=mpif.o
+LIB1=-lm
 
 FOR=mpif77 -g -c 
 FLN=mpif77 -g 
@@ -17,7 +15,7 @@ clean:
 	rm -f *.o *.x 
 
 $(EXE1): $(OBJ1) 
-	$(LNK) -o $@ $(OBJ1) 
+	$(LNK) -o $@ $(OBJ1) $(LIB1)
 
 
 mpic.o: mpic.c
