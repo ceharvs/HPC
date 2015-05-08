@@ -36,8 +36,8 @@ int main(int argc,char **argv)
   gethostname(buf,512);
 
   /* X and Y step sizes */
-  deltaX = 0.0005;
-  deltaY = 0.0005;
+  deltaX = 0.05;
+  deltaY = 0.05;
   minT = 500;
 
   /* X and Y maximum values */
@@ -118,7 +118,7 @@ int main(int argc,char **argv)
   /* Print file to outputs */
   fprintf(fp, "x,y,xVel,yVel\n");
   for(i=0; i<elements; i++){
-    //fprintf(fp,"%f,%f,%f,%f\n",xP[i],yP[i],xV[i],yV[i]);
+    fprintf(fp,"%f,%f,%f,%f\n",xP[i],yP[i],xV[i],yV[i]);
   }
   
 
