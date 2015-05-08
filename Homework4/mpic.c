@@ -27,7 +27,7 @@ double magnitude(double vx, double vy) {
 int main(int argc,char **argv)
 {
   FILE *fp;
-  int seed, k, i, j, err, nprc, rank, N, Lx, Ly, elements, my_Lx, my_Ly;
+  int seed, k, i, j, err, nprc, rank, N, Lx, Ly, elements, my_Lx, my_Ly, c;
   double x, y, *xP, *yP, *xV, *yV, LxMAX, LyMAX, deltaX, deltaY;
   double xpt, ypt, min_X, max_X, min_Y, max_Y, deltaT, minT, dT;
   char buf[512];
@@ -37,15 +37,15 @@ int main(int argc,char **argv)
   gethostname(buf,512);
 
   /* X and Y step sizes */
-  deltaX = 1.0;
-  deltaY = 1.0;
+  deltaX = 0.005;
+  deltaY = 0.005;
   minT = 500;
   seed = time(NULL);
   srand(seed*rank);
 
   /* X and Y maximum values */
-  LxMAX = 10.0;
-  LyMAX = 10.0;
+  LxMAX = 1.0;
+  LyMAX = 1.0;
  
   /* Total Number of Bins */
   Lx = ceil(LxMAX/deltaX);
@@ -87,6 +87,7 @@ int main(int argc,char **argv)
   /* Then generating N particles randomly in each sub-domain */
   printf("proc=%d\t minX=%f, maxX=%f, my_Lx=%d\n",rank, min_X, max_X, my_Lx);
   printf("proc=%d\t minY=%f, maxY=%f, my_Ly=%d\n",rank, min_Y, max_Y, my_Ly);
+  c = 0;
   for(i=0; i<my_Lx; i++) {
     x = min_X+i*deltaX; 
     for(j=0; j<my_Ly; j++) {
@@ -94,21 +95,23 @@ int main(int argc,char **argv)
       for (k=0; k<N; k++) { 
         xpt = randRange(x, x+deltaX);
         ypt = randRange(y, y+deltaY);
-        xP[i*my_Lx+j+k] = xpt;
-        yP[i*my_Lx+j+k] = ypt;
+        xP[c] = xpt;
+        yP[c] = ypt;
 if(rank==0){
-  printf("[%f,%f],[%f,%f] = (%f,%f)\n",x,x+deltaX,y,y+deltaY,xpt,ypt);
+  //printf("%d\n",c);
+  //printf("[%f,%f],[%f,%f] = (%f,%f)\n",x,x+deltaX,y,y+deltaY,xpt,ypt);
 }
       
         /* Compute the X and Y velocities*/
-        xV[i*my_Lx+j+k] = xGRAD(xpt, ypt);
-        yV[i*my_Lx+j+k] = yGRAD(xpt, ypt);
+        xV[c] = xGRAD(xpt, ypt);
+        yV[c] = yGRAD(xpt, ypt);
         
         /* Compute the deltaT */
-        deltaT = deltaX/magnitude(xV[i*my_Lx+j+k],yV[i*my_Lx+j+k]);
+        deltaT = deltaX/magnitude(xV[c],yV[c]);
         if (deltaT < minT) {
             minT = deltaT;
         }
+        c++;
       }
     }
   }
