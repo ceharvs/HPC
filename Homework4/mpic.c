@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+#include <time.h>
 #include <string.h>
 
 #include <mpi.h>
@@ -26,7 +27,7 @@ double magnitude(double vx, double vy) {
 int main(int argc,char **argv)
 {
   FILE *fp;
-  int k, i, j, err, nprc, rank, N, Lx, Ly, elements, my_Lx, my_Ly;
+  int seed, k, i, j, err, nprc, rank, N, Lx, Ly, elements, my_Lx, my_Ly;
   double x, y, *xP, *yP, *xV, *yV, LxMAX, LyMAX, deltaX, deltaY;
   double xpt, ypt, min_X, max_X, min_Y, max_Y, deltaT, minT, dT;
   char buf[512];
@@ -39,6 +40,8 @@ int main(int argc,char **argv)
   deltaX = 0.05;
   deltaY = 0.05;
   minT = 500;
+  seed = time(NULL);
+  srand(seed*rank);
 
   /* X and Y maximum values */
   LxMAX = 1.0;
