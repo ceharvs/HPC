@@ -37,8 +37,8 @@ int main(int argc,char **argv)
   gethostname(buf,512);
 
   /* X and Y step sizes */
-  deltaX = 0.005;
-  deltaY = 0.005;
+  deltaX = 0.05;
+  deltaY = 0.05;
   minT = 500;
   seed = time(NULL);
   srand(seed*rank);
