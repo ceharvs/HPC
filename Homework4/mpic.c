@@ -37,8 +37,8 @@ int main(int argc,char **argv)
   gethostname(buf,512);
 
   /* X and Y step sizes */
-  deltaX = 0.05;
-  deltaY = 0.05;
+  deltaX = 0.1;
+  deltaY = 0.1;
   minT = 500;
   seed = time(NULL);
   srand(seed*rank);
@@ -52,7 +52,7 @@ int main(int argc,char **argv)
   Ly = ceil(LyMAX/deltaY);
 
   /* Number of particles per bin */
-  N = 10;
+  N = 1;
 
   /* Elements per processor */
   elements = (N*Lx*Ly)/nprc;
@@ -92,11 +92,13 @@ int main(int argc,char **argv)
     for(j=0; j<my_Ly; j++) {
       y = min_Y+j*deltaY;
       for (k=0; k<N; k++) { 
-
         xpt = randRange(x, x+deltaX);
         ypt = randRange(y, y+deltaY);
         xP[i*my_Lx+j+k] = xpt;
         yP[i*my_Lx+j+k] = ypt;
+if(rank==0){
+  printf("[%f,%f],[%f,%f] = (%f,%f)\n",x,x+deltaX,y,y+deltaY,xpt,ypt);
+}
       
         /* Compute the X and Y velocities*/
         xV[i*my_Lx+j+k] = xGRAD(xpt, ypt);
