@@ -37,8 +37,8 @@ int main(int argc,char **argv)
   gethostname(buf,512);
 
   /* X and Y step sizes */
-  deltaX = 0.1;
-  deltaY = 0.1;
+  deltaX = 0.01;
+  deltaY = 0.01;
   minT = 500;
   seed = time(NULL);
   srand(seed*rank);
@@ -52,7 +52,7 @@ int main(int argc,char **argv)
   Ly = ceil(LyMAX/deltaY);
 
   /* Number of particles per bin */
-  N = 1;
+  N = 5;
 
   /* Elements per processor */
   elements = (N*Lx*Ly)/nprc;
