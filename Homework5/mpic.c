@@ -133,14 +133,14 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
   //}
   // Print file to outputs 
   c = 0;
-  fprintf(fp, "x,y,deltaPhi\n");
+  fprintf(fp, "x,y,phi,deltaPhi\n");
   for(i=0; i<(Nx/size); i++) {
     x = min_X+i*deltaX; 
     for(j=0; j<Ny; j++) {
       y = min_Y+j*deltaY;
       c = i*Nx+j;
 //printf("%f,%f,%d\n",x,y,c);
-      fprintf(fp,"%f,%f,%f\n",x,y,deltaPhi[c]);
+      fprintf(fp,"%f,%f,%f\n",x,y,phi[c],deltaPhi[c]);
     }
   }
 
