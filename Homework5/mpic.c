@@ -46,8 +46,8 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
   phi1 = 1.0;
 
   /* Set up processor-specific information */
-  min_X = Nx/size*rank;
-  max_X = Nx/size*(rank+1);
+  min_X = Lx/(double)size*rank;
+  max_X = Lx/(double)size*(rank+1);
   min_Y = 0.0;  //We only split in the X direction
   max_Y = Ly;
 
