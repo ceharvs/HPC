@@ -40,14 +40,14 @@ int main(int argc,char **argv)
   /* Maximum number of bins*/
   Nx = ceil(Lx/deltaX);
   Ny = ceil(Ly/deltaY);
-
+printf("Nx=%d\tNy=%d\n",Nx,Ny);
   /* Constant variables*/
   phi0 = 0.0;
   phi1 = 1.0;
 
   /* Set up processor-specific information */
-  min_X = Lx/size*rank;
-  max_X = Lx/size*(rank+1);
+  min_X = Nx/size*rank;
+  max_X = Nx/size*(rank+1);
   min_Y = 0.0;  //We only split in the X direction
   max_Y = Ly;
 
@@ -93,6 +93,7 @@ int main(int argc,char **argv)
   phi = malloc(Nx*Ny*sizeof(double));
   deltaPhi = malloc(Nx*Ny*sizeof(double));
 
+  printf("minx=%f\t maxX=%f\t rank=%d\n",min_X, max_X, rank);
   for(i=iMin; i<iMax; i++) {
     x = min_X+i*deltaX; 
     for(j=0; j<Ny; j++) {
@@ -124,7 +125,6 @@ int main(int argc,char **argv)
     }
   }
 
-  printf("minx=%f\t maxX=%f\t rank=%d\n",min_X, max_X, rank);
   //MPI_Reduce(&minT,&dT,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
 
   // Print the Minimum Delta T 
