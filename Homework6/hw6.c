@@ -76,7 +76,7 @@ int main(int argc,char **argv)
   Gy = Ny+1;
 
   /* Constant variables*/
-  phi0 = 0.0;
+  phi0 = -1.0;
   phi1 = 1.0;
 
   /* Number of particles per bin */
@@ -261,7 +261,7 @@ int main(int argc,char **argv)
   /* Compute E-Field from phi */
   for(i=1; i<my_Gx-1; i++) {
     for(j=1; j<Gy-1; j++) {
-      c = i*Gy+k;
+      c = i*Gy+j;
       Ex[c] = -(phi[c+Gy]-phi[c-Gy])/(2*deltaX);
       Ey[c] = -(phi[c+1]-phi[c-1])/(2*deltaY);
     }
