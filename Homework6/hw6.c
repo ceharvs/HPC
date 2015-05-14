@@ -44,7 +44,7 @@ int main(int argc,char **argv)
   double min_X, min_Y, xpt, ypt;
 
   /* Define arrays */
-  double *rho, *phi, *rho_share, *rho_rec;
+  double *rho, *phi, *rho_share, *rho_rec, *element;
   double *xPts, *yPts, *xVel, *yVel, *q, *Fx, *Fy, *Ex, *Ey;
   
   err=MPI_Init(&argc,&argv);
@@ -126,6 +126,7 @@ int main(int argc,char **argv)
   xVel = malloc(elements*sizeof(double));
   yVel = malloc(elements*sizeof(double));
   q = malloc(elements*sizeof(double));
+  element = malloc(7*sizeof(double));
 
   /* Compute Charge Density on grid */
   printf("PROC:%d\t my_Nx:%d\t my_Gx:%d\t min_X:%f\n",rank,my_Nx,my_Gx,min_X);
@@ -288,14 +289,53 @@ int main(int argc,char **argv)
   for(c=0; c<elements;c++) {
     x = floor(xPts[c]/deltaX)*deltaX;//min_X+i*deltaX;
     y = floor(yPts[c]/deltaY)*deltaY;//min_X+i*deltaX;
-        xPts[c] = xPts[c] + xVel[c]*deltaT+0.5*Fx[c]*deltaT*deltaT;
-        yPts[c] = yPts[c] + yVel[c]*deltaT+0.5*Fy[c]*deltaT*deltaT;
-        xVel[c] = xVel[c] + 0.5*Fx[c]*deltaT;
-        yVel[c] = yVel[c] + 0.5*Fy[c]*deltaT;
-        c++;
-        
-        /* Migrate Particle if they cross boundaries 
-        //Migrate Right
+    xPts[c] = xPts[c] + xVel[c]*deltaT+0.5*Fx[c]*deltaT*deltaT;
+    yPts[c] = yPts[c] + yVel[c]*deltaT+0.5*Fy[c]*deltaT*deltaT;
+    xVel[c] = xVel[c] + 0.5*Fx[c]*deltaT;
+    yVel[c] = yVel[c] + 0.5*Fy[c]*deltaT;
+    c++;
+    
+    /* Migrate Particle if they cross boundaries */
+    if(yPts[c] < 0.0 || yPts[c] > Ly) {
+      printf("Losing a particle on the Y-axis\n");
+      //Move the last y item to the point that c is at
+      yPts[c] = yPts[elements-1];
+      xPts[c] = xPts[elements-1];
+      xVel[c] = xVel[elements-1];
+      yVel[c] = yVel[elements-1];
+      Fx[c] = Fx[elements-1];
+      Fy[c] = Fy[elements-1];
+      q[c] = q[elements-1];
+      //Subtract elements by 1
+      elements = elements-1;
+    // Lost particle off X boundary overall
+    } else if(xPts[c] < 0.0 || xPts[c] > Lx) {
+      printf("Losing a particle on the X-axis\n");
+      //Move the last y item to the point that c is at
+      yPts[c] = yPts[elements-1];
+      xPts[c] = xPts[elements-1];
+      xVel[c] = xVel[elements-1];
+      yVel[c] = yVel[elements-1];
+      Fx[c] = Fx[elements-1];
+      Fy[c] = Fy[elements-1];
+      q[c] = q[elements-1];
+      //Subtract elements by 1
+      elements = elements-1;
+    //Send a Particle left
+    }  /*else if(xPts[c] < min_X) {
+      element[0] = xPts[c];
+      element[1] = yPts[c];
+      element[2] = xVel[c];
+      element[3] = yVel[c];
+      element[4] = Fx[c];
+      element[5] = Fy[c];
+      element[6] = q[c];
+      
+      //Perform MPI_Send
+      MPI_Send(element, 7, MPI_DOUBLE, rank-1, 0, MPI_COMM_WORLD);
+      
+
+       //Migrate Right
         if(xPts[c] > x_Min+deltaX*my_Nx)
           MPI_Send(xPts[x],1,MPI_DOUBLE,xp,
           xPts[c] = NULL;
