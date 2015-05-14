@@ -1,6 +1,6 @@
 
-EXE1=mpic.x
-OBJ1=mpic.o
+EXE1=hw6.x
+OBJ1=hw6.o
 LIB1=-lm
 
 FOR=mpif77 -g -c 
@@ -18,7 +18,7 @@ $(EXE1): $(OBJ1)
 	$(LNK) -o $@ $(OBJ1) $(LIB1)
 
 
-mpic.o: mpic.c
+hw6.o: hw6.c
 	$(CMP) $?
 
 

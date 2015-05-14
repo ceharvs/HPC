@@ -7,6 +7,22 @@
 
 #include <mpi.h>
 
+double randRange(double min, double max) {
+  return min+((double)rand()/(double)RAND_MAX)*(max-min);
+}
+
+double xGRAD(double x, double y) {
+    return -(0.3*x*x)/((x*x+y*y)*(x*x+y*y))+(0.15)/(x*x+y*y)+0.5;
+}
+
+double yGRAD(double x, double y) {
+    return -(0.3*x*y)/((x*x+y*y)*(x*x+y*y));
+}
+
+double magnitude(double vx, double vy) {
+    return sqrt(vx*vx+vy*vy);
+}
+
 double Rij(double deltaX, double deltaY, double phi, double phi_left, double phi_right, double phi_up, double phi_down, double rho) {
   double a, b, c;
   a = 1.0/(deltaX*deltaX);
@@ -18,9 +34,11 @@ double Rij(double deltaX, double deltaY, double phi, double phi_left, double phi
 int main(int argc,char **argv)
 {
   FILE *fp;
-  int c, seed, i, j, err, size, rank, Lx, Ly, ci, Nx, Ny, my_Nx, iMax, iMin;
+  int k, elements, N, c, seed, i, j, err, size, rank, Lx, Ly, ci, Nx, Ny, my_Nx, iMax, iMin;
   double x, y, *rho, *deltaPhi, *phi, deltaX, deltaY, xi, phi0, phi1, deltaTi, t, maxT, deltaT;
-  double min_X, max_X, min_Y, max_Y;
+  double min_X, max_X, min_Y, max_Yi, minT;
+  double dT, xpt, ypt, *xPts, *yPts, *xVel, *yVel, *q;
+  int x_near, y_near, my_Nx_extended;
   char buf[512];
   err=MPI_Init(&argc,&argv);
   err=MPI_Comm_size(MPI_COMM_WORLD,&size);
@@ -32,6 +50,10 @@ int main(int argc,char **argv)
   deltaY = 0.05;
   deltaT = 1.0;
   maxT = 1.0;
+  minT = 500.0;
+  seed = time(NULL);
+  srand(seed*rank);
+  
 
   /* Maximum number of the grid limit */
   Lx = 1.0;
@@ -41,15 +63,21 @@ int main(int argc,char **argv)
   Nx = ceil(Lx/deltaX);
   Ny = ceil(Ly/deltaY);
 printf("Nx=%d\tNy=%d\n",Nx,Ny);
+
   /* Constant variables*/
   phi0 = 0.0;
   phi1 = 1.0;
+
+  /* Number of particles per bin */
+  N = 1;
+
+  /* Elements per processor */
+  elements = (N*Nx*Ny)/size;
 
   /* Set up processor-specific information */
   min_X = Lx/(double)size*rank;
   max_X = Lx/(double)size*(rank+1);
   min_Y = 0.0;  //We only split in the X direction
-  max_Y = Ly;
 
   /* Local Number of Bins */
   my_Nx = Nx/size;
@@ -64,7 +92,6 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
   } else {
     fp=fopen("output3.csv","w");
   }   
- 
   c = 0;
 
   /* Check to make sure boundaries aren't violated */
@@ -79,6 +106,9 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
     iMin = -1;  
   }
 
+  /* Number of bins with Boundaries*/
+  my_Nx_extended = iMax-iMin;
+
   if(rank==0){
     fp=fopen("output0.csv","w");
   } else if(rank==1){
@@ -89,16 +119,23 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
     fp=fopen("output3.csv","w");
   }      
  
-  rho = malloc(Nx*Ny*sizeof(double));
-  phi = malloc(Nx*Ny*sizeof(double));
-  deltaPhi = malloc(Nx*Ny*sizeof(double));
+  rho = malloc(my_Nx_extended*Ny*sizeof(double));
+  phi = malloc(my_Nx_extended*Ny*sizeof(double));
+  deltaPhi = malloc(my_Nx_extended*Ny*sizeof(double));
+  xPts = malloc(elements*sizeof(double));
+  yPts = malloc(elements*sizeof(double));
+  xVel = malloc(elements*sizeof(double));
+  yVel = malloc(elements*sizeof(double));
+  q = malloc(elements*sizeof(double));
 
+  /* Compute Charge Density on grid */
+  /* This has an extended boundary when needed */
   printf("minx=%f\t maxX=%f\t rank=%d\n",min_X, max_X, rank);
   for(i=iMin; i<iMax; i++) {
     x = min_X+i*deltaX; 
     for(j=0; j<Ny; j++) {
       y = min_Y+j*deltaY;
-      c = i*Nx+j;
+      c = i*my_Nx_extended+j;
       if(x == 0) {
         phi[c] = phi0;
       } else if(x==Lx) { 
@@ -109,9 +146,68 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
       } else { 
         phi[c] = 0.0;
       }
-      rho[c] = 1.0;
+      rho[c] = 0.0;
     }
   }
+
+  /* Initalize Particles in each domain */
+  printf("proc=%d\t minX=%f, maxX=%f, my_Lx=%d\n",rank, min_X, max_X, my_Nx);
+  c = 0;
+  for(i=0; i<my_Nx; i++) {
+    x = min_X+i*deltaX; 
+    for(j=0; j<Ny; j++) {
+      y = min_Y+j*deltaY;
+      for (k=0; k<N; k++) { 
+        xpt = randRange(x, x+deltaX);
+        ypt = randRange(y, y+deltaY);
+        xPts[c] = xpt;
+        yPts[c] = ypt;
+      
+        /* Compute the X and Y velocities*/
+        xVel[c] = 0;
+        yVel[c] = 0;
+
+	/* Assign a random value to the particle charge */
+        q[c] = randRange(-1.0, 1.0);        
+        c++;
+      }
+    }
+  }
+
+  /* Compute Charge Density on grid */
+  c = 0;
+  for(i=0; i<my_Nx; i++) {
+    x = min_X+i*deltaX; 
+    for(j=0; j<Ny; j++) {
+      y = min_Y+j*deltaY;
+      for (k=0; k<N; k++) { 
+        /* Find the nearest grid point */
+        // Top or Bottom half
+        if(yPts[c] > y+deltaY/2.0) {
+          //Item is on the top half
+          y = y + deltaY;
+        }
+        //Left or right side
+        if(xPts[c] > x+deltaX/2.0) {
+          x = x + deltaX;
+        }
+        //Nearest Grid Point
+        x_near = (int)((x-min_X)/deltaX);
+        y_near = (int)((y-min_Y)/deltaY);
+
+        //Add the charge density to the proper rho[c]
+        
+        rho[c] += 
+      
+
+
+
+        c++;
+      }
+    }
+  }
+
+
   //Compute the gradient   
   for(t=0; t<maxT; t+=deltaT) {
     for(i=iMin+1; i<iMax-1; i++) {
@@ -128,26 +224,30 @@ printf("Nx=%d\tNy=%d\n",Nx,Ny);
   //MPI_Reduce(&minT,&dT,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
 
   // Print the Minimum Delta T 
-  //if(rank==0){
-  //  printf("minimum deltaT = %f\n",dT);
-  //}
+  if(rank==0){
+    printf("minimum deltaT = %f\n",dT);
+  }
   // Print file to outputs 
   c = 0;
   fprintf(fp, "x,y,phi,deltaPhi\n");
-  for(i=0; i<=(Nx/size); i++) {
+  /*for(i=0; i<=(Nx/size); i++) {
     x = min_X+i*deltaX; 
     for(j=0; j<Ny; j++) {
       y = min_Y+j*deltaY;
       c = i*Nx+j;
-//printf("%f,%f,%d\n",x,y,c);
       fprintf(fp,"%f,%f,%f,%f\n",x,y,phi[c],deltaPhi[c]);
     }
-  }
+  }*/
 
   free(rho);
   free(phi);
   free(deltaPhi);
+  free(xPts);
+  free(xVel);
+  free(yVel);
+  free(yPts);
   fclose(fp);
+  free(q)
   err=MPI_Finalize();
   return 0;
 }
