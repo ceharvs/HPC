@@ -183,15 +183,14 @@ int main(int argc,char **argv)
     }
   }
 
+  /* Loop through Time Steps! */
   for(t = deltaT; t <= tMAX; t+=deltaT) {
+  printf("*** Time Step t=%f ***\n",t);
   /* Compute Charge Density on Grid */
   //Cycle through all of the grid points and assign their charge to a grid point
-  c = 0;
-  for(i=0; i<my_Nx; i++) {
-    x = min_X+i*deltaX;
-    for(j=0; j<Ny; j++) {
-      y = min_Y+ j*deltaY;
-      for(k=0; k<N; k++) {
+  for(c=0; c<elements;c++) {
+    x = floor(xPts[c]/deltaX)*deltaX;//min_X+i*deltaX;
+    y = floor(yPts[c]/deltaY)*deltaY;//min_X+i*deltaX;
         /* Find the nearest grid point */
         if(yPts[c] > (y+deltaY/2.0)) {
           //Particle is on the top half
@@ -206,9 +205,6 @@ int main(int argc,char **argv)
 
         //Add the charge density to the proper rho grid
         rho[x_near*Gy+y_near] += q[c]/(deltaX*deltaY);
-        c++;
-      }
-    }
   }
 
   /* Sort out the Rho array that needs to be shared */
@@ -268,12 +264,9 @@ int main(int argc,char **argv)
   }
 
   /* Find the Forces on each Particle */
-  c = 0;
-  for(i=0; i<my_Nx; i++) {
-    x = min_X+i*deltaX;
-    for(j=0; j<Ny; j++) {
-      y = min_Y+ j*deltaY;
-      for(k=0; k<N; k++) {
+  for(c=0; c<elements;c++) {
+    x = floor(xPts[c]/deltaX)*deltaX;//min_X+i*deltaX;
+    y = floor(yPts[c]/deltaY)*deltaY;//min_X+i*deltaX;
         /* Find the nearest grid point */
         if(yPts[c] > (y+deltaY/2.0)) {
           //Particle is on the top half
@@ -289,16 +282,12 @@ int main(int argc,char **argv)
         //Add the charge density to the proper rho grid
         Fx[c] = q[c]*Ex[x_near*Gy+y_near];
         Fy[c] = q[c]*Ey[x_near*Gy+y_near];
-        c++;
-      }
-    }
   }
 
   /* Advance Particles and Recompute Velocity */
-  c = 0;
-  for(i=0; i<my_Nx; i++) {
-    for(j=0; j<Ny; j++) {
-      for(k=0; k<N; k++) {
+  for(c=0; c<elements;c++) {
+    x = floor(xPts[c]/deltaX)*deltaX;//min_X+i*deltaX;
+    y = floor(yPts[c]/deltaY)*deltaY;//min_X+i*deltaX;
         xPts[c] = xPts[c] + xVel[c]*deltaT+0.5*Fx[c]*deltaT*deltaT;
         yPts[c] = yPts[c] + yVel[c]*deltaT+0.5*Fy[c]*deltaT*deltaT;
         xVel[c] = xVel[c] + 0.5*Fx[c]*deltaT;
@@ -313,8 +302,6 @@ int main(int argc,char **argv)
           yPts[c] = NULL;*/
           
 
-      }
-    }
   }
   
   
